@@ -9,6 +9,7 @@ import (
 	"database/sql/driver"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -513,6 +514,35 @@ func (sc *snowflakeConn) GetQueryStatus(
 		queryRet.Stats.ScanBytes,
 		queryRet.Stats.ProducedRows,
 	}, nil
+}
+
+// GetSessionToken returns a session token suitable for direct API
+// calls, including SPCS. In particular, you can exchange an OAuth
+// token obtained from a browser sign-in for a session OAuth token
+// this way:
+//
+//	tok := "ver:1-hint:21..."
+//	c := &gosnowflake.Config{
+//	  Account:       <account_name>,
+//	  Token:         tok,
+//	  Authenticator: gosnowflake.AuthTypeOAuth,
+//	}
+//	ctr := gosnowflake.NewConnector(gosnowflake.SnowflakeDriver{}, *c)
+//	conn, err := ctr.Connect(context.Background())
+//	// check error
+//	tokOut, err := conn.(gosnowflake.SnowflakeConnection).GetSessionToken()
+func (sc *snowflakeConn) GetSessionToken() (string, error) {
+	if sc.rest == nil {
+		return "", errors.New("not connected")
+	}
+	if sc.rest.TokenAccessor == nil {
+		return "", errors.New("no token available")
+	}
+	tok, _, _ := sc.rest.TokenAccessor.GetTokens()
+	if tok == "" {
+		return "", errors.New("no token available")
+	}
+	return tok, nil
 }
 
 // QueryArrowStream returns batches which can be queried for their raw arrow
