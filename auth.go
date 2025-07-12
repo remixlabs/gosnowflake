@@ -21,7 +21,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const (
+var (
 	clientType = "Go"
 )
 
@@ -58,6 +58,16 @@ const (
 	// AuthTypeWorkloadIdentityFederation is to use CSP identity for authentication
 	AuthTypeWorkloadIdentityFederation
 )
+
+// SetClientID overrides the default client app ID ("Go")
+func SetClientAppID(clientID string) {
+	clientType = clientID
+}
+
+// SetClientVersion overrides the default client app version
+func SetClientAppVersion(version string) {
+	SnowflakeGoDriverVersion = version
+}
 
 func (authType AuthType) isOauthNativeFlow() bool {
 	return authType == AuthTypeOAuthAuthorizationCode || authType == AuthTypeOAuthClientCredentials
@@ -612,7 +622,7 @@ func authenticateWithConfig(sc *snowflakeConn) error {
 	var samlResponse []byte
 	var proofKey []byte
 	var err error
-	//var consentCacheIdToken = true
+	// var consentCacheIdToken = true
 
 	if sc.cfg.Authenticator == AuthTypeExternalBrowser || sc.cfg.Authenticator == AuthTypeOAuthAuthorizationCode || sc.cfg.Authenticator == AuthTypeOAuthClientCredentials {
 		if (runtime.GOOS == "windows" || runtime.GOOS == "darwin") && sc.cfg.ClientStoreTemporaryCredential == configBoolNotSet {

@@ -113,6 +113,8 @@ type SnowflakeQueryStatus struct {
 // SnowflakeConnection is a wrapper to snowflakeConn that exposes API functions
 type SnowflakeConnection interface {
 	GetQueryStatus(ctx context.Context, queryID string) (*SnowflakeQueryStatus, error)
+	// GetSessionToken gets an OAuth session token, if possible
+	GetSessionToken() (string, error)
 }
 
 // checkQueryStatus returns the status given the query ID. If successful,
@@ -189,7 +191,7 @@ func (sc *snowflakeConn) checkQueryStatus(
 			QueryID:        qid,
 		}).exceptionTelemetry(sc)
 	}
-	//success
+	// success
 	return &queryRet, nil
 }
 
