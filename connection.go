@@ -521,11 +521,20 @@ func (sc *snowflakeConn) GetQueryStatus(
 // token obtained from a browser sign-in for a session OAuth token
 // this way:
 //
+//	acct := "acme"
 //	tok := "ver:1-hint:21..."
+//	gosnowflake.SetClientAppID("PythonConnector")
+//	gosnowflake.SetClientAppVersion("3.15.0")
+//
+//	params := map[string]*string{}
+//	JSON := "json"
+//	params["PYTHON_CONNECTOR_QUERY_RESULT_FORMAT"] = &JSON
 //	c := &gosnowflake.Config{
-//	  Account:       <account_name>,
-//	  Token:         tok,
-//	  Authenticator: gosnowflake.AuthTypeOAuth,
+//	  Account:          acct,
+//	  Token:            tok,
+//	  Authenticator:    gosnowflake.AuthTypeOAuth,
+//	  KeepSessionAlive: true,
+//	  Params:           params,
 //	}
 //	ctr := gosnowflake.NewConnector(gosnowflake.SnowflakeDriver{}, *c)
 //	conn, err := ctr.Connect(context.Background())
